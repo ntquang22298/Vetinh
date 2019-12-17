@@ -27,7 +27,8 @@ trainloader, validloader = dataloader(colab=False, batch_size=BATCH_STEP_SIZE)
 net = TimeNet()
 net.double()
 # net.load_state_dict(torch.load('weights/model-sae3-checkpoint.pt'))
-if CUDA: 
+if CUDA:
+    print('using cuda')
     net.cuda()
 
 criterion = nn.MSELoss()
