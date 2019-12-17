@@ -11,6 +11,8 @@ import random
 from tqdm import tqdm
 from sklearn.preprocessing import normalize
 from sae_dataloader import dataloader
+from torch.utils.tensorboard import SummaryWriter
+
 
 from timenet import TimeNet
 
@@ -20,7 +22,7 @@ EPOCHS = 100
 BATCH_STEP_SIZE = 64
 
 print('preparing data')
-trainloader, validloader = dataloader(colab=False, batch_size=2)
+trainloader, validloader = dataloader(colab=False, batch_size=BATCH_STEP_SIZE)
 
 net = TimeNet()
 net.double()
@@ -35,6 +37,9 @@ optimizer = torch.optim.Adam(net.parameters(), lr=learning_rate)
 best_train_loss = 1000
 best_val_loss = 1000
 lossArr = []
+
+train_writer = SummaryWriter(log_dir='logs-tensorboard/train')
+val_writer = SummaryWriter(log_dir='logs-tensorboard/val')
 for i in range(EPOCHS):
     train_loss_value = 0
     val_loss_value = 0
@@ -62,8 +67,9 @@ for i in range(EPOCHS):
 
         loss.backward()
         optimizer.step()
-    print("train ----> epoch: %s, loss: %s" % (i, train_loss_value))
+    print('\ttrain ----> epoch: %s, loss: %s' % (i, train_loss_value))
     train_loss_epoch = np.average(train_loss_epoch)
+    train_writer.add_scalar('loss', train_loss_epoch, i)
     # print('current_loss: %s, best_train_loss: %s' % (train_loss_epoch, best_train_loss))
     
     # validation
@@ -82,8 +88,9 @@ for i in range(EPOCHS):
 
         val_loss_value = loss.data.cpu().numpy() * input_.size(0) if CUDA else loss.data.numpy() * input_.size(0)
         val_loss_epoch = np.append(val_loss_epoch, [val_loss_value], axis=0)
-    print("val ----> epoch: %s, loss: %s" % (i, val_loss_value))
+    print('\tval ----> epoch: %s, loss: %s' % (i, val_loss_value))
     val_loss_epoch= np.average(val_loss_epoch)
+    val_writer.add_scalar('loss', val_loss_epoch, i)
     print('current_loss: %s, best_val_loss: %s' % (val_loss_epoch, best_val_loss))
 
 
