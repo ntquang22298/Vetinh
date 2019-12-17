@@ -70,7 +70,7 @@ for i in range(EPOCHS):
         loss.backward()
         optimizer.step()
     train_loss_epoch = np.average(train_loss_epoch)
-    print('\ttrain ----> loss: %s' % train_loss_value)
+    print('\ttrain ----> loss: %s' % train_loss_epoch)
     train_writer.add_scalar('loss', train_loss_epoch, i)
     # print('current_loss: %s, best_train_loss: %s' % (train_loss_epoch, best_train_loss))
     
@@ -91,13 +91,12 @@ for i in range(EPOCHS):
         val_loss_value = loss.data.cpu().numpy() * input_.size(0) if CUDA else loss.data.numpy() * input_.size(0)
         val_loss_epoch = np.append(val_loss_epoch, [val_loss_value], axis=0)
     val_loss_epoch= np.average(val_loss_epoch)
-    print('\tval ----> loss: %s' % val_loss_value)
+    print('\tval ----> loss: %s' % val_loss_epoch)
     val_writer.add_scalar('loss', val_loss_epoch, i)
-
-    print('best_val_loss: %s' % best_val_loss)
 
     if (val_loss_epoch < best_val_loss):
         best_val_loss = val_loss_epoch
+        print('best_val_loss: %s' % best_val_loss)
         if CUDA:
             torch.save(net.cpu().state_dict(), 'weights/timenet.pt')
             print('save weights')
