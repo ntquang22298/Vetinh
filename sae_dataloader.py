@@ -15,8 +15,8 @@ datasets = [
 ]
 
 class SAEDataloader(Dataset):
-    def __init__(self, colab=False):
-        self.root = '../drive/My Drive/Colab Notebooks/sae_datasets' if colab else 'sae_datasets' 
+    def __init__(self, colab=False, root=''):
+        self.root = root
         atensor = datamaker(self.root).clone().detach()
         self.data = torch.unsqueeze(atensor, 2)
 
@@ -52,11 +52,20 @@ def datamaker(root):
 
     return train_data
 
-def dataloader(colab=False, batch_size=2):
-    dataset = SAEDataloader(colab=colab)
-    loader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
 
-    return loader
+def dataloader(colab=False, batch_size=2):
+    traindataset = SAEDataloader(colab=colab, root='sae_datasets/train')
+    trainloader = DataLoader(traindataset, batch_size=batch_size, shuffle=True)
+
+    validdataset = SAEDataloader(colab=colab, root='sae_datasets/valid')
+    validloader = DataLoader(validdataset, batch_size=batch_size, shuffle=True)
+    return trainloader, validloader
+
+def testloader(colab=False, batch_size=2):
+    testdataset = SAEDataloader(colab=colab, root='sae_datasets/test')
+    testloader = DataLoader(testdataset, batch_size=batch_size)
+
+    return testloader
 
 if __name__ == '__main__':
     # data = datamaker()
