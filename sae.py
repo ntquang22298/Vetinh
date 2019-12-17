@@ -62,9 +62,9 @@ for i in range(EPOCHS):
 
         loss.backward()
         optimizer.step()
-    print("epoch: %s, loss: %s" % (i, train_loss_value))
+    print("train ----> epoch: %s, loss: %s" % (i, train_loss_value))
     train_loss_epoch = np.average(train_loss_epoch)
-    print('current_loss: %s, best_train_loss: %s' % (train_loss_epoch, best_train_loss))
+    # print('current_loss: %s, best_train_loss: %s' % (train_loss_epoch, best_train_loss))
     
     # validation
     for inputs in tqdm(validloader):
@@ -82,7 +82,7 @@ for i in range(EPOCHS):
 
         val_loss_value = loss.data.cpu().numpy() * input_.size(0) if CUDA else loss.data.numpy() * input_.size(0)
         val_loss_epoch = np.append(val_loss_epoch, [val_loss_value], axis=0)
-    print("epoch: %s, loss: %s" % (i, val_loss_value))
+    print("val ----> epoch: %s, loss: %s" % (i, val_loss_value))
     val_loss_epoch= np.average(val_loss_epoch)
     print('current_loss: %s, best_val_loss: %s' % (val_loss_epoch, best_val_loss))
 
@@ -91,8 +91,10 @@ for i in range(EPOCHS):
         best_val_loss = val_loss_epoch
         if CUDA:
             torch.save(net.cpu().state_dict(), 'weights/timenet.pt')
+            print('save weights')
             net.cuda()
         else:
+            print('save weights')
             torch.save(net.state_dict(), 'weights/timenet.pt')
     # torch.save(net.state_dict(), 'weights/model-sae3-checkpoint.pt')
     # np.savetxt('loss.csv', lossArr, delimiter=',')
